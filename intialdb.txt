@@ -1,0 +1,35 @@
+-- Create a stored procedure with a parameter
+CREATE PROCEDURE GetRowsByExecutionTime
+    @filterTime DATETIME
+AS
+BEGIN
+    -- Create a table variable to store the result set
+    DECLARE @TempData TABLE (
+        RecordID INT,
+        UserID INT,
+        UserName NVARCHAR(255),
+        UserEmail NVARCHAR(255),
+        DataValue NVARCHAR(MAX),
+        NotificationFlag BIT,
+        ExecutionTime DATETIME
+    )
+
+    -- Insert data with different timestamps
+    INSERT INTO @TempData (RecordID, UserID, UserName, UserEmail, DataValue, NotificationFlag, ExecutionTime)
+    VALUES
+        (1, 101, 'User1', 'user1@example.com', 'Data1', 1, DATEADD(MINUTE, 15, GETDATE())), -- 15 minutes ahead
+        (2, 102, 'User2', 'user2@example.com', 'Data2', 0, GETDATE()),                   -- current time
+        (3, 103, 'User3', 'user3@example.com', 'Data3', 1, DATEADD(MINUTE, -15, GETDATE())) -- 15 minutes behind
+
+    -- Return the data from the table variable filtered by ExecutionTime
+    SELECT
+        RecordID,
+        UserID,
+        UserName,
+        UserEmail,
+        DataValue,
+        NotificationFlag,
+        ExecutionTime
+    FROM @TempData
+    WHERE ExecutionTime > @filterTime
+END
