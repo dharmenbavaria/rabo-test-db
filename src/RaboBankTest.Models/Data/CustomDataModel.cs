@@ -2,9 +2,9 @@
 {
     public class CustomDataModel
     {
-        public int RecordId { get; set; }
+        public Guid RecordId { get; set; }
 
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         public string UserName { get; set; }
 

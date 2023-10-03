@@ -24,6 +24,8 @@ public class ProcessDataRequestHandlerTests
         var dataProcessorMock = new Mock<IDataProcessor>();
         var messageSenderMock = new Mock<IMessageSender>();
         var mapperMock = new Mock<IMapper>();
+        var recordId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
         var mockData = new List<CustomDataModel>
             {
@@ -31,9 +33,9 @@ public class ProcessDataRequestHandlerTests
                     {
                         DataValue = "Temp",
                         NotificationFlag = true,
-                        RecordId = 1,
+                        RecordId = recordId,
                         UserEmail = "abc@temp.com",
-                        UserId = 1,
+                        UserId = userId.ToString(),
                         UserName = "dharmen.bavaria"
                     }
             };
@@ -48,9 +50,9 @@ public class ProcessDataRequestHandlerTests
         // Set up mapperMock to return a CustomModelNotification
         var mockNotification = new CustomModelNotification
             {
-                RecordId = 1,
+                RecordId = recordId,
                 UserEmail = "abc@temp.com",
-                UserId = 1,
+                UserId = userId.ToString(),
                 UserName = "dharmen.bavaria",
                 DataValue = "Temp"
             };
@@ -79,7 +81,7 @@ public class ProcessDataRequestHandlerTests
 
         // Verify that Map method was called with the correct data and CustomModelNotification was sent
         mapperMock.Verify(
-            m => m.Map<CustomModelNotification>(It.Is<CustomDataModel>(p => p.RecordId == 1 && p.UserId == 1 && p.UserEmail == "abc@temp.com" && p.UserName == "dharmen.bavaria")),
+            m => m.Map<CustomModelNotification>(It.Is<CustomDataModel>(p => p.RecordId == recordId && p.UserId == userId.ToString() && p.UserEmail == "abc@temp.com" && p.UserName == "dharmen.bavaria")),
             Times.Exactly(mockData.Count));
 
         // Verify that Publish method was called with the CustomModelNotification

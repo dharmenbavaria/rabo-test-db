@@ -25,7 +25,7 @@ public class DataProcessor : IDataProcessor
     {
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync(cancellationToken);
-        var query = "EXEC GetCustomModelData @LastExecutionTime";
+        var query = "EXEC GetRecordsByDateModified @LastExecutionTime";
 
         var parameters = new
             {
