@@ -1,27 +1,30 @@
--- Create a stored procedure with a parameter
-CREATE PROCEDURE GetRowsByExecutionTime
-    @filterTime DATETIME
+-- Use the newly created database
+USE TestDb;
+GO
+
+-- Create the table PART1
+CREATE TABLE TestTable (
+    RecordID UNIQUEIDENTIFIER PRIMARY KEY,
+    UserID NVARCHAR(255) NOT NULL,
+    UserName NVARCHAR(255) NOT NULL,
+    UserEmail NVARCHAR(255) NOT NULL,
+    DataValue NVARCHAR(MAX),
+    NotificationFlag BIT NOT NULL,
+    DateModified DATETIME NOT NULL
+);
+
+-- Create an index on DateModified for efficient querying PART1
+CREATE INDEX IX_DateModified ON TestTable (DateModified);
+
+
+-- Create the stored procedure PART2
+CREATE PROCEDURE GetRecordsByDateModified
+    @filterDate DATETIME
 AS
 BEGIN
-    -- Create a table variable to store the result set
-    DECLARE @TempData TABLE (
-        RecordID INT,
-        UserID INT,
-        UserName NVARCHAR(255),
-        UserEmail NVARCHAR(255),
-        DataValue NVARCHAR(MAX),
-        NotificationFlag BIT,
-        ExecutionTime DATETIME
-    )
+    SET NOCOUNT ON;
 
-    -- Insert data with different timestamps
-    INSERT INTO @TempData (RecordID, UserID, UserName, UserEmail, DataValue, NotificationFlag, ExecutionTime)
-    VALUES
-        (1, 101, 'User1', 'user1@example.com', 'Data1', 1, DATEADD(MINUTE, 15, GETDATE())), -- 15 minutes ahead
-        (2, 102, 'User2', 'user2@example.com', 'Data2', 0, GETDATE()),                   -- current time
-        (3, 103, 'User3', 'user3@example.com', 'Data3', 1, DATEADD(MINUTE, -15, GETDATE())) -- 15 minutes behind
-
-    -- Return the data from the table variable filtered by ExecutionTime
+    -- Return records where DateModified is greater than the filter date
     SELECT
         RecordID,
         UserID,
@@ -29,7 +32,7 @@ BEGIN
         UserEmail,
         DataValue,
         NotificationFlag,
-        ExecutionTime
-    FROM @TempData
-    WHERE ExecutionTime > @filterTime
-END
+        DateModified
+    FROM TestTable
+    WHERE DateModified > @filterDate;
+END;
